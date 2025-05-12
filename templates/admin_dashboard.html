@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="{{ 'dark-mode' if session.get('dark_mode') else '' }}">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Film Project Tracker</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('add_project') }}">Add New Project</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <button id="modeToggle" class="btn btn-outline-secondary">Toggle Mode</button>
+          </li>
+
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+            </li>
+          {% endif %}
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+
+    <div class="row">
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5>Project Overview</h5>
+          </div>
+          <div class="card-body">
+            <p>Total Projects: {{ total_projects }}</p>
+            <p>Total Active Projects: {{ total_active_projects }}</p>
+            <p>Total Archived Projects: {{ total_archived_projects }}</p>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5>User Management</h5>
+          </div>
+          <div class="card-body">
+            <p>Total Users: {{ total_users }}</p>
+            <a href="{{ url_for('view_users') }}" class="btn btn-primary">View All Users</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Recent Projects</h5>
+          </div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Genre</th>
+                  <th>Status</th>
+                  <th>Owner</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for project in recent_projects %}
+                  <tr>
+                    <td>{{ project.title }}</td>
+                    <td>{{ project.genre }}</td>
+                    <td>{{ project.status }}</td>
+                    <td>{{ project.owner.username }}</td>
+                    <td>
+                      <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-info btn-sm">View</a>
+                      <form method="POST" action="{{ url_for('delete_project') }}" style="display:inline;">
+                        <input type="hidden" name="project_id" value="{{ project.id }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

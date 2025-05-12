@@ -1,0 +1,106 @@
+/* Default Light Mode */
+body {
+    background-color: #fff;
+    color: #000;
+}
+
+.card {
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    color: #000; /* Ensure text color is black in light mode */
+}
+
+.navbar {
+    background-color: #f8f9fa; /* Light mode navbar */
+    color: #000;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #000; /* Light mode text */
+}
+
+input, textarea, select {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+input[type="file"] {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+}
+
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #fff !important;
+}
+
+body.dark-mode .card {
+    background-color: #333;
+    border-color: #444;
+}
+
+body.dark-mode .card-header {
+    background-color: #444;
+    color: #fff; /* Ensure text color is white in dark mode */
+}
+
+body.dark-mode .card-body {
+    color: #fff; /* Ensure card body text is white */
+}
+
+body.dark-mode .navbar {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+body.dark-mode .navbar-light .navbar-nav .nav-link {
+    color: #ddd !important;
+}
+
+body.dark-mode .navbar-light .navbar-nav .nav-link:hover {
+    color: #fff;
+}
+
+body.dark-mode input, body.dark-mode textarea, body.dark-mode select {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+body.dark-mode input:focus, body.dark-mode textarea:focus, body.dark-mode select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+body.dark-mode input[type="file"] {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+body.dark-mode .btn-outline-secondary {
+    border-color: #ddd;
+    color: #ddd;
+}
+
+body.dark-mode .btn-outline-secondary:hover {
+    background-color: #444;
+    color: #fff;
+}
+/* Dark Mode - Project Detail Link */
+body.dark-mode a.text-dark {
+    color: #fff !important;
+}

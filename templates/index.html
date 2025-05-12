@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Film Project Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ✅ Correct Bootstrap 5.3 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS for Light/Dark Mode -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body class="bg-light {{ 'dark-mode' if session.get('dark_mode') else '' }}">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Film Project Tracker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('add_project') }}">Add New Project</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <button id="modeToggle" class="btn btn-outline-secondary" onclick="toggleMode()">Toggle Mode</button>
+                    </li>
+                    <!-- Login/Logout logic using Flask-Login's current_user -->
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <h1 class="text-center mb-4">Film Project Tracker</h1>
+
+        <!-- Add New Film Project Form -->
+        <div class="card mb-4">
+            <div class="card-header">Add New Film Project</div>
+            <div class="card-body">
+                <form action="{{ url_for('add_project') }}" method="POST" enctype="multipart/form-data" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="title" class="form-control" placeholder="Film Title" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="genre" class="form-control" placeholder="Genre" required>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="status" class="form-select" required>
+                            <option value="Planning">Planning</option>
+                            <option value="Filming">Filming</option>
+                            <option value="Post-production">Post-production</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="file" name="script" class="form-control" accept=".pdf,.txt">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Add Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Current Projects List -->
+        {% for project in projects %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ url_for('project_detail', project_id=project.id) }}" class="text-decoration-none text-dark">
+                        <strong>{{ project.title }} ({{ project.genre }})</strong>
+                    </a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-info text-dark me-2">{{ project.status }}</span>
+                    <form action="{{ url_for('delete_project') }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this project?');">
+                        <input type="hidden" name="project_id" value="{{ project.id }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if project.script_filename %}
+                <p>
+                    <a href="{{ url_for('uploaded_file', filename=project.script_filename) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View Script</a>
+                    <a href="{{ url_for('download_file', filename=project.script_filename) }}" class="btn btn-sm btn-outline-success">Download</a>
+                </p>
+                {% endif %}
+
+                <!-- Crew Table -->
+                <h5 class="mt-3">Cast & Crew</h5>
+                {% if project.crew_members %}
+                <ul class="list-group mb-2">
+                    {% for member in project.crew_members %}
+                    <li class="list-group-item">
+                        {{ member.name }} – <em>{{ member.role }}</em>
+                        <span class="text-muted">(Call: {{ member.call_time.strftime('%Y-%m-%d %H:%M') }})</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No crew members added yet.</p>
+                {% endif %}
+
+                <!-- Add Crew Form -->
+                <form action="{{ url_for('add_crew') }}" method="POST" class="row g-2 mt-2">
+                    <input type="hidden" name="project_id" value="{{ project.id }}">
+                    <div class="col-md-3">
+                        <input type="text" name="name" class="form-control" placeholder="Name" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="role" class="form-control" placeholder="Role" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="datetime-local" name="call_time" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-secondary w-100">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No projects added yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- ✅ Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            // Save the dark mode preference in session or a cookie for persistence
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            fetch('/set_dark_mode', {
+                method: 'POST',
+                body: JSON.stringify({ dark_mode: isDarkMode }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>

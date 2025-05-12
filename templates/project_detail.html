@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Film Project Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5.3 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Film Project Tracker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('add_project') }}">Add New Project</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <button id="modeToggle" class="btn btn-outline-secondary">Toggle Mode</button>
+
+
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                      </li>
+                    {% else %}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                      </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Back to Projects Link -->
+        <a href="{{ url_for('home') }}" class="btn btn-link mb-3">&larr; Back to Projects</a>
+
+        <h1 class="text-center mb-4">{{ project.title }} Details</h1>
+
+        <!-- Film Project Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>{{ project.title }} ({{ project.genre }})</strong>
+                <span class="badge bg-info text-dark">{{ project.status }}</span>
+            </div>
+            <div class="card-body">
+                <p><strong>Script: </strong>
+                    {% if project.script_filename %}
+                        <a href="{{ url_for('uploaded_file', filename=project.script_filename) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View Script</a>
+                        <a href="{{ url_for('download_file', filename=project.script_filename) }}" class="btn btn-sm btn-outline-success">Download</a>
+                    {% else %}
+                        No script uploaded yet.
+                    {% endif %}
+                </p>
+
+                <!-- Crew Details -->
+                <h5 class="mt-3">Cast & Crew</h5>
+                {% if project.crew_members %}
+                    <ul class="list-group mb-2">
+                        {% for member in project.crew_members %}
+                            <li class="list-group-item">
+                                {{ member.name }} – <em>{{ member.role }}</em>
+                                <span class="text-muted">(Call: {{ member.call_time.strftime('%Y-%m-%d %H:%M') }})</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No crew members added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoUwE6cz+AdzNp5MMP+FhGpC3WUwS6bvcU+0VYQ8/9HcV9K" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+</body>
+</html>
