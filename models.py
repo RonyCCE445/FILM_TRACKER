@@ -21,6 +21,7 @@ class FilmProject(db.Model):
     genre = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     script_filename = db.Column(db.String(200))
+    poster_filename = db.Column(db.String(255))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
     owner = db.relationship('User', backref=db.backref('projects', lazy=True))
@@ -30,7 +31,7 @@ class FilmProject(db.Model):
 
 class CrewMember(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('film_project.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('film_project.id'), nullable=True)
     name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False)
     call_time = db.Column(db.DateTime, nullable=False)

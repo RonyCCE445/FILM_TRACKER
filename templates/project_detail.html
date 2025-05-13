@@ -2,95 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Film Project Details</title>
+    <title>{{ project.title }} Details - Film Project Tracker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap 5.3 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
 
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Film Project Tracker</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('add_project') }}">Add New Project</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <button id="modeToggle" class="btn btn-outline-secondary">Toggle Mode</button>
-
-
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                      </li>
-                    {% else %}
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                      </li>
-                    {% endif %}
-
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container py-4">
-        <!-- Back to Projects Link -->
-        <a href="{{ url_for('home') }}" class="btn btn-link mb-3">&larr; Back to Projects</a>
-
-        <h1 class="text-center mb-4">{{ project.title }} Details</h1>
-
-        <!-- Film Project Details -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <strong>{{ project.title }} ({{ project.genre }})</strong>
-                <span class="badge bg-info text-dark">{{ project.status }}</span>
-            </div>
-            <div class="card-body">
-                <p><strong>Script: </strong>
-                    {% if project.script_filename %}
-                        <a href="{{ url_for('uploaded_file', filename=project.script_filename) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View Script</a>
-                        <a href="{{ url_for('download_file', filename=project.script_filename) }}" class="btn btn-sm btn-outline-success">Download</a>
-                    {% else %}
-                        No script uploaded yet.
-                    {% endif %}
-                </p>
-
-                <!-- Crew Details -->
-                <h5 class="mt-3">Cast & Crew</h5>
-                {% if project.crew_members %}
-                    <ul class="list-group mb-2">
-                        {% for member in project.crew_members %}
-                            <li class="list-group-item">
-                                {{ member.name }} – <em>{{ member.role }}</em>
-                                <span class="text-muted">(Call: {{ member.call_time.strftime('%Y-%m-%d %H:%M') }})</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Film Project Tracker</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('add_project') }}">Add New Project</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                <li class="nav-item"><button id="modeToggle" class="btn btn-outline-secondary">Toggle Mode</button></li>
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
-                    <p class="text-muted">No crew members added yet.</p>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
                 {% endif %}
-            </div>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <h1 class="text-center mb-4">{{ project.title }} Details</h1>
+
+    <!-- Film Project Details -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><strong>{{ project.title }}</strong> ({{ project.genre }})</span>
+            <span class="badge bg-info text-dark">{{ project.status }}</span>
+        </div>
+        <div class="card-body">
+            <p><strong>Script:</strong>
+                {% if project.script_filename %}
+                    <a href="{{ url_for('uploaded_file', filename=project.script_filename) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">View Script</a>
+                    <a href="{{ url_for('download_file', filename=project.script_filename) }}" class="btn btn-sm btn-outline-success">Download</a>
+                {% else %}
+                    <span class="text-muted">No script uploaded yet.</span>
+                {% endif %}
+            </p>
+
+            <!-- Crew Details -->
+            <h5 class="mt-4">Cast & Crew</h5>
+            {% if project.crew_members %}
+                <ul class="list-group mb-3">
+                    {% for member in project.crew_members %}
+                        <li class="list-group-item">
+                            <strong>{{ member.name }}</strong> – <em>{{ member.role }}</em>
+                            <span class="text-muted ms-2">(Call: {{ member.call_time.strftime('%Y-%m-%d %H:%M') }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No crew members added yet.</p>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Bootstrap 5 Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoUwE6cz+AdzNp5MMP+FhGpC3WUwS6bvcU+0VYQ8/9HcV9K" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Poster Upload Section -->
+    <div class="card mt-4">
+        <div class="card-header">Upload Film Poster</div>
+        <div class="card-body">
+            <form action="{{ url_for('upload_poster', project_id=project.id) }}" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="file" name="poster" accept="image/*" class="form-control" required aria-label="Upload Film Poster">
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Poster</button>
+            </form>
 
+            {% if project.poster_filename and poster_url %}
+                <div class="text-center mt-4">
+                    <h5>Project Poster</h5>
+                    <img src="{{ poster_url }}" alt="{{ project.title }} Poster" class="img-fluid rounded shadow-sm" style="max-width: 300px;">
 
+                    <div class="mt-3 d-flex justify-content-center gap-2 flex-wrap">
+                  <!-- View Poster Button -->
+<a href="{{ url_for('view_poster', project_id=project.id, filename=project.poster_filename) }}" target="_blank">
+    <button type="button" class="btn btn-sm btn-outline-primary">View Poster</button>
+</a>
+
+<!-- Download Poster Button -->
+<a href="{{ url_for('download_file', filename=project.poster_filename) }}">
+    <button type="button" class="btn btn-sm btn-outline-success">Download Poster</button>
+</a>
+
+<!-- Delete Poster Button -->
+<form action="{{ url_for('delete_poster', project_id=project.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete the poster?');">
+    <button type="submit" class="btn btn-sm btn-outline-danger">Delete Poster</button>
+</form>
+
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-muted mt-3">No poster uploaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
